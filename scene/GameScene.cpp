@@ -22,6 +22,13 @@ void GameScene::Initialize() {
 	//サウンドデータの読み込み
 	soundDataHandle_ = audio_->LoadWave("se_sad03.wav");
 
+	//X,Y,Z 方向のスケーリングを設定
+	worldTransform_.scale_ = {5.0f, 5.0f, 5.0f};
+	//X,Y,Z 軸回りの回転角を設定
+	worldTransform_.rotation_ = {XM_PI / 4.0f, XM_PI / 4.0f,  0.0f};
+	//X,Y,Z 軸回りの平行移動を設定
+	worldTransform_.translation_ = {10.0f, 10.0f, 10.0f};
+
 	//ワールドトランスフォームの初期化
 	worldTransform_.Initialize();
 	//ビュープロジェクション
@@ -48,14 +55,19 @@ void GameScene::Update() {
 		audio_->StopWave(voiceHandle_);
 	}
 	
-	//変数の値をインクリメント
-	value_++;
 	//値を含んだ文字列
-	std::string strDebug = std::string("Value:")+
-	std::to_string(value_);
-
-	//デバッグテキストの表示
-	debugText_->Print(strDebug, 50, 50, 1.0f);
+	debugText_->SetPos(50, 70);
+	debugText_->Printf(
+	  "translation:(%f,%f,%f)", worldTransform_.translation_.x, worldTransform_.translation_.y,
+	  worldTransform_.translation_.z);
+	debugText_->SetPos(50, 85);
+	debugText_->Printf(
+	  "rotation:(%f,%f,%f)", worldTransform_.rotation_.x, worldTransform_.rotation_.y,
+	  worldTransform_.rotation_.z);
+	debugText_->SetPos(50, 100);
+	debugText_->Printf(
+	  "scale:(%f,%f,%f)", worldTransform_.scale_.x, worldTransform_.scale_.y,
+	  worldTransform_.scale_.z);
 }
 
 void GameScene::Draw() {
@@ -98,7 +110,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
-	sprite_->Draw();
+	/*sprite_->Draw();*/
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
