@@ -6,17 +6,57 @@ using namespace DirectX;
 
 GameScene::GameScene() {}
 
-GameScene::~GameScene() {}
+GameScene::~GameScene() {
+	delete sprite_;
+	delete model_;
+}
 
 void GameScene::Initialize() {
-
+	textureHandle_ = TextureManager::Load("mario.jpg");
 	dxCommon_ = DirectXCommon::GetInstance();
 	input_ = Input::GetInstance();
 	audio_ = Audio::GetInstance();
 	debugText_ = DebugText::GetInstance();
+	model_ = Model::Create();
+
+	//サウンドデータの読み込み
+	soundDataHandle_ = audio_->LoadWave("se_sad03.wav");
+
+	//ワールドトランスフォームの初期化
+	worldTransform_.Initialize();
+	//ビュープロジェクション
+	viewProjection_.Initialize();
+
+	//スプライトの生成
+	sprite_ = Sprite::Create(textureHandle_, {100, 50});
+	//音声再生
+	audio_->PlayWave(soundDataHandle_);
+	voiceHandle_ = audio_->PlayWave(soundDataHandle_, true);
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+	//スプライトの今の座標を取得
+	XMFLOAT2 position = sprite_->GetPosition();
+	//座標を{2,0}移動
+	position.x += 2.0f;
+	position.y += 1.0f;
+	//移動した座標をスプライトに反映
+	sprite_->SetPosition(position);
+
+	//スペースキーを押した瞬間
+	if (input_->TriggerKey(DIK_SPACE)) {
+		audio_->StopWave(voiceHandle_);
+	}
+	
+	//変数の値をインクリメント
+	value_++;
+	//値を含んだ文字列
+	std::string strDebug = std::string("Value:")+
+	std::to_string(value_);
+
+	//デバッグテキストの表示
+	debugText_->Print(strDebug, 50, 50, 1.0f);
+}
 
 void GameScene::Draw() {
 
@@ -44,6 +84,8 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
+	// 3Dモデル描画
+	model_->Draw(worldTransform_, viewProjection_, textureHandle_);
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
@@ -56,6 +98,7 @@ void GameScene::Draw() {
 	/// <summary>
 	/// ここに前景スプライトの描画処理を追加できる
 	/// </summary>
+	sprite_->Draw();
 
 	// デバッグテキストの描画
 	debugText_->DrawAll(commandList);
