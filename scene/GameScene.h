@@ -1,8 +1,8 @@
 ﻿#pragma once
 
 #include "Audio.h"
-#include "DirectXCommon.h"
 #include "DebugText.h"
+#include "DirectXCommon.h"
 #include "Input.h"
 #include "Model.h"
 #include "SafeDelete.h"
