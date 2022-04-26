@@ -29,22 +29,20 @@ void GameScene::Initialize() {
 	//乱数範囲(座標用)
 	std::uniform_real_distribution<float> posDist(-10.f, 10.f);
 
-
 	for (size_t i = 0; i < 9; i++)
-		for (size_t j = 0; j < 9; j++) {
-			// X,Y,Z 方向のスケーリングを設定
-			if (i % 2 == 0 || j % 2 == 0)
-				worldTransform_[i][j].scale_ = {1.0f, 1.0f, 1.0f};
-			else
-				worldTransform_[i][j].scale_ = {0, 0, 0};
-			// X,Y,Z 軸回りの回転角を設定
-			worldTransform_[i][j].rotation_ = {0, 0, 0};
-			// X,Y,Z 軸回りの平行移動を設定
-			worldTransform_[i][j].translation_ = {4.0f * i - 16.0f, 4.0f * j - 16.0f, 0};
+		for (size_t j = 0; j < 9; j++)
+			for (size_t k = 0; k < 9; k++) {
+				// X,Y,Z 方向のスケーリングを設定
+				worldTransform_[i][j][k].scale_ = {1.0f, 1.0f, 1.0f};
+				// X,Y,Z 軸回りの回転角を設定
+				worldTransform_[i][j][k].rotation_ = {0, 0, 0};
+				// X,Y,Z 軸回りの平行移動を設定
+				worldTransform_[i][j][k].translation_ = {
+				  4.0f * i - 16.0f, 4.0f * j - 16.0f, 4.0f * k };
 
-			//ワールドトランスフォームの初期化
-			worldTransform_[i][j].Initialize();
-		}
+				//ワールドトランスフォームの初期化
+				worldTransform_[i][j][k].Initialize();
+			}
 
 	//ビュープロジェクション
 	viewProjection_.Initialize();
@@ -86,8 +84,9 @@ void GameScene::Draw() {
 	/// </summary>
 	// 3Dモデル描画
 	for (size_t i = 0; i < 9; i++)
-		for (size_t j = 0; j < 9; j++) {
-			model_->Draw(worldTransform_[i][j], viewProjection_, textureHandle_);
+		for (size_t j = 0; j < 9; j++)
+			for (size_t k = 0; k < 9; k++) {
+				model_->Draw(worldTransform_[i][j][k], viewProjection_, textureHandle_);
 		}
 
 	// 3Dオブジェクト描画後処理
