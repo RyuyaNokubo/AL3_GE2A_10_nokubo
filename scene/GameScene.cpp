@@ -32,23 +32,28 @@ void GameScene::Initialize() {
 	//サウンドデータの読み込み
 	soundDataHandle_ = audio_->LoadWave("se_sad03.wav");
 
-	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+	for (size_t i = 0; i < _countof(worldTransform_) / 2; i++) {
 		// X,Y,Z 方向のスケーリングを設定
-		worldTransform_[i].scale_ = {1.0f, 1.0f, 1.0f};
+		worldTransform_[i].scale_ = {5.0f, 5.0f, 5.0f};
 		// X,Y,Z 軸回りの回転角を設定
-		worldTransform_[i].rotation_ = {rotDist(engine), rotDist(engine), rotDist(engine)};
+		worldTransform_[i].rotation_ = {0, 0, 0};
 		// X,Y,Z 軸回りの平行移動を設定
-		worldTransform_[i].translation_ = {posDist(engine), posDist(engine), posDist(engine)};
+		worldTransform_[i].translation_ = {10.0f * i-50, -15.0f, 0};
 
 		//ワールドトランスフォームの初期化
 		worldTransform_[i].Initialize();
 	}
-	//カメラ視点座標を設定
-	viewProjection_.eye = {0, 0, -10};
-	//カメラ注視視点座標を設定
-	viewProjection_.target = {10, 0, 0};
-	//カメラ上方向ベクトルを設定(右上45度指定)
-	viewProjection_.up = {cosf(XM_PI / 4.0f), sinf(XM_PI / 4.0f), 0.0f};
+	for (size_t i = 50; i < _countof(worldTransform_) ; i++) {
+		// X,Y,Z 方向のスケーリングを設定
+		worldTransform_[i].scale_ = {5.0f, 5.0f, 5.0f};
+		// X,Y,Z 軸回りの回転角を設定
+		worldTransform_[i].rotation_ = {0, 0, 0};
+		// X,Y,Z 軸回りの平行移動を設定
+		worldTransform_[i].translation_ = {10.0f * (i-50)-50, 15.0f, 0};
+
+		//ワールドトランスフォームの初期化
+		worldTransform_[i].Initialize();
+	}
 
 	//ビュープロジェクション
 	viewProjection_.Initialize();
@@ -60,88 +65,7 @@ void GameScene::Initialize() {
 	// voiceHandle_ = audio_->PlayWave(soundDataHandle_, true);
 }
 
-void GameScene::Update() {
-	//視点移動処理
-	{
-		//視点の移動ベクトル
-		XMFLOAT3 move = {0, 0, 0};
-
-		//視点の移動速さ
-		const float kEyeSpeed = 0.2f;
-
-		//押した方向で移動ベクトルを変更
-		if (input_->PushKey(DIK_W)) {
-			move = {0, 0, kEyeSpeed};
-		} else if (input_->PushKey(DIK_S)) {
-			move = {0, 0, -kEyeSpeed};
-		}
-		//視点移動(ベクトルの加算)
-		viewProjection_.eye.x += move.x;
-		viewProjection_.eye.y += move.y;
-		viewProjection_.eye.z += move.z;
-
-		//行列の再計算
-		viewProjection_.UpdateMatrix();
-
-		//デバッグ用表示
-		debugText_->SetPos(50, 50);
-		debugText_->Printf(
-		  "eye:(%f,%f,%f)", viewProjection_.eye.x, viewProjection_.eye.y, viewProjection_.eye.z);
-	}
-
-	//注視点移動処理
-	{
-		//注視点の移動ベクトル
-		XMFLOAT3 move = {0, 0, 0};
-
-		//注視点の移動速さ
-		const float kTargetSpeed = 0.2f;
-
-		//押した方向で移動ベクトルを変更
-		if (input_->PushKey(DIK_LEFT)) {
-			move = {-kTargetSpeed, 0, 0};
-		} else if (input_->PushKey(DIK_RIGHT)) {
-			move = {kTargetSpeed, 0, 0};
-		}
-		//注視点移動(ベクトルの加算)
-		viewProjection_.target.x += move.x;
-		viewProjection_.target.y += move.y;
-		viewProjection_.target.z += move.z;
-
-		//行列の再計算
-		viewProjection_.UpdateMatrix();
-
-		//デバッグ用表示
-		debugText_->SetPos(50, 70);
-		debugText_->Printf(
-		  "target:(%f,%f,%f)", viewProjection_.target.x, viewProjection_.target.y,
-		  viewProjection_.target.z);
-	}
-
-	//上方向回転処理
-	{
-		//上方向の回転速さ[ラジアン/frame]
-		const float kUpRotSpeed = 0.05f;
-
-		//押した方向で移動ベクトルを変更
-		if (input_->PushKey(DIK_SPACE)) {
-			viewAngle += kUpRotSpeed;
-			//2πを超えたら0に戻す
-			viewAngle = fmodf(viewAngle, XM_2PI);
-		}
-
-		//上方向ベクトルを計算(半径1の円周上の座標)
-		viewProjection_.up = {cosf(viewAngle), sinf(viewAngle), 0.0f};
-
-		//行列の再計算
-		viewProjection_.UpdateMatrix();
-
-		//デバッグ用表示
-		debugText_->SetPos(50, 90);
-		debugText_->Printf(
-		  "up:(%f,%f,%f)", viewProjection_.up.x, viewProjection_.up.y, viewProjection_.up.z);
-	}
-}
+void GameScene::Update() {}
 
 void GameScene::Draw() {
 
