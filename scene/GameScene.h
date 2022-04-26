@@ -59,11 +59,13 @@ class GameScene {
 	uint32_t voiceHandle_ = 0;
 
 	//ワールドトランスフォーム
-	WorldTransform worldTransform_[9][9][9];
+	WorldTransform worldTransform_[10];
 	//ビュープロジェクション
 	ViewProjection viewProjection_;
 	//カメラ上方向の角度
 	float viewAngle = 0.0f;
+
+	float angle[10];
 
 	/// <summary>
 	/// ゲームシーン用

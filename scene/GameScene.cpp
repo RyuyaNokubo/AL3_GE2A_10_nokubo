@@ -4,6 +4,7 @@
 #include <random>
 
 using namespace DirectX;
+const float PI = 3.141592;
 
 GameScene::GameScene() {}
 
@@ -29,20 +30,18 @@ void GameScene::Initialize() {
 	//乱数範囲(座標用)
 	std::uniform_real_distribution<float> posDist(-10.f, 10.f);
 
-	for (size_t i = 0; i < 9; i++)
-		for (size_t j = 0; j < 9; j++)
-			for (size_t k = 0; k < 9; k++) {
-				// X,Y,Z 方向のスケーリングを設定
-				worldTransform_[i][j][k].scale_ = {1.0f, 1.0f, 1.0f};
-				// X,Y,Z 軸回りの回転角を設定
-				worldTransform_[i][j][k].rotation_ = {0, 0, 0};
-				// X,Y,Z 軸回りの平行移動を設定
-				worldTransform_[i][j][k].translation_ = {
-				  4.0f * i - 16.0f, 4.0f * j - 16.0f, 4.0f * k };
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		angle[i] = (i + 1) * XM_2PI / 10;
+		// X,Y,Z 方向のスケーリングを設定
+		worldTransform_[i].scale_ = {1.0f, 1.0f, 1.0f};
+		// X,Y,Z 軸回りの回転角を設定
+		worldTransform_[i].rotation_ = {0, 0, 0};
+		// X,Y,Z 軸回りの平行移動を設定
+		worldTransform_[i].translation_ = {10.0f * cosf(angle[i]), 10.0f * sinf(angle[i]), 0};
 
-				//ワールドトランスフォームの初期化
-				worldTransform_[i][j][k].Initialize();
-			}
+		//ワールドトランスフォームの初期化
+		worldTransform_[i].Initialize();
+	}
 
 	//ビュープロジェクション
 	viewProjection_.Initialize();
@@ -54,7 +53,20 @@ void GameScene::Initialize() {
 	// voiceHandle_ = audio_->PlayWave(soundDataHandle_, true);
 }
 
-void GameScene::Update() {}
+void GameScene::Update() {
+	//速さ
+	const float speed = 0.03f;
+
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		//移動ベクトル
+		angle[i] += speed;
+		angle[i] = fmodf(angle[i], XM_2PI);
+		worldTransform_[i].translation_.x = 10.0f*(cosf(angle[i]) - sinf(angle[i]));
+		worldTransform_[i].translation_.y = 10.0f*(sinf(angle[i]) + cosf(angle[i]));
+
+		worldTransform_[i].UpdateMatrix();
+	}
+}
 
 void GameScene::Draw() {
 
@@ -83,11 +95,9 @@ void GameScene::Draw() {
 	/// ここに3Dオブジェクトの描画処理を追加できる
 	/// </summary>
 	// 3Dモデル描画
-	for (size_t i = 0; i < 9; i++)
-		for (size_t j = 0; j < 9; j++)
-			for (size_t k = 0; k < 9; k++) {
-				model_->Draw(worldTransform_[i][j][k], viewProjection_, textureHandle_);
-		}
+	for (size_t i = 0; i < _countof(worldTransform_); i++) {
+		model_->Draw(worldTransform_[i], viewProjection_, textureHandle_);
+	}
 
 	// 3Dオブジェクト描画後処理
 	Model::PostDraw();
